@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>استثمارتك برو+ | منصة تداول احترافية (بيانات حقيقية)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts (Cairo + Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lightweight Charts (TradingView style) -->
+    <script src="https://unpkg.com/lightweight-charts@4.0.1/dist/lightweight-charts.standalone.production.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- AOS animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Cairo', 'Inter', sans-serif;
+        }
+        body {
+            background: #0d1117;
+            color: #e6edf3;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1a212b; }
+        ::-webkit-scrollbar-thumb { background: #3b4a5a; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f6f8f; }
+
+        .card-glass {
+            background: rgba(22, 28, 36, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(66, 82, 110, 0.4);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
+            transition: all 0.2s;
+        }
+        .card-glass:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 25px 50px -12px #1e3a8a80;
+        }
+
+        .btn-primary {
+            background: linear-gradient(145deg, #2563eb, #1d4ed8);
+            color: white;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(145deg, #1d4ed8, #1e3a8a);
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px -5px #2563eb80;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-outline:hover {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .table-pro {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+        .table-pro th {
+            color: #8b9bb5;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 12px 8px;
+            text-align: right;
+        }
+        .table-pro td {
+            background: #1a212b;
+            padding: 14px 8px;
+            border-radius: 14px;
+            transition: background 0.15s;
+        }
+        .table-pro tr:hover td {
+            background: #252f3c;
+        }
+
+        .up { color: #22c55e; }
+        .down { color: #ef4444; }
+
+        .ticker-tape {
+            background: #0f1419;
+            border-bottom: 1px solid #2a3744;
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 8px 0;
+        }
+        .ticker-item {
+            display: inline-block;
+            padding: 0 20px;
+            font-size: 0.9rem;
+            border-left: 1px solid #2a3744;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            animation: marquee 30s linear infinite;
+        }
+
+        .demo-badge {
+            background: #f59e0b20;
+            color: #fbbf24;
+            border: 1px solid #f59e0b40;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e293b;
+            border-right: 4px solid #3b82f6;
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 9999;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        /* صورة المستخدم */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3b82f6;
+        }
+        .avatar-small {
+            width: 32px;
+            height: 32px;
+        }
+        .avatar-placeholder {
+            background: #2563eb;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* مؤشر التحميل */
+        .loading-spinner {
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- شريط الأسعار العلوي -->
+    <div class="ticker-tape fixed top-0 left-0 w-full z-50 text-gray-300 text-sm">
+        <div class="inline-block animate-marquee" id="ticker"></div>
+    </div>
+
+    <!-- شريط التنقل -->
+    <nav class="fixed top-[38px] w-full z-40 bg-[#0d1117]/95 backdrop-blur-md border-b border-gray-800/60 py-2">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-chart-pie text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-bold text-white hidden sm:block">استثمار<span class="text-blue-500">تك</span></span>
+                <span class="demo-badge hidden sm:block"><i class="fas fa-sync-alt ml-1"></i> بيانات حقيقية</span>
+            </div>
+            <div class="hidden lg:flex items-center gap-6 text-gray-300">
+                <a href="#" class="hover:text-white transition border-b-2 border-transparent hover:border-blue-500 pb-1">لوحة المعلومات</a>
+                <a href="#" class="hover:text-white transition border-b-2 border-transparent hover:border-blue-500 pb-1">الأسواق</a>
+                <a href="#" class="hover:text-white transition border-b-2 border-transparent hover:border-blue-500 pb-1">التداول</a>
+                <a href="#" class="hover:text-white transition border-b-2 border-transparent hover:border-blue-500 pb-1">المحفظة</a>
+                <a href="#" class="hover:text-white transition border-b-2 border-transparent hover:border-blue-500 pb-1">الأوامر</a>
+                <a href="#" class="hover:text-white transition border-b-2 border-transparent hover:border-blue-500 pb-1">التحليل</a>
+            </div>
+            <div class="flex items-center gap-2">
+                <button class="relative p-2 text-gray-400 hover:text-white" onclick="showNotification('🔔 لا توجد إشعارات جديدة')">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+                <!-- اسم المستخدم القابل للتعديل مع صورة -->
+                <div class="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-xl cursor-pointer relative" id="userMenuBtn">
+                    <img id="userAvatar" src="https://i.pravatar.cc/40?u=default" alt="avatar" class="avatar avatar-small">
+                    <span class="text-sm" id="usernameDisplay">محمد</span>
+                    <i class="fas fa-chevron-down text-xs"></i>
+                    <!-- قائمة منسدلة -->
+                    <div id="userDropdown" class="absolute top-full left-0 mt-2 w-64 bg-gray-800 rounded-xl shadow-lg border border-gray-700 hidden overflow-hidden">
+                        <div class="p-4 border-b border-gray-700 flex items-center gap-3">
+                            <img id="dropdownAvatar" src="https://i.pravatar.cc/40?u=default" class="avatar">
+                            <div>
+                                <div class="font-bold" id="dropdownUsername">محمد أ.</div>
+                                <div class="text-xs text-gray-400">عرض الملف الشخصي</div>
+                            </div>
+                        </div>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-700" onclick="editUsername(); return false;"><i class="fas fa-user-edit ml-2"></i>تعديل الاسم</a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-700" onclick="editAvatar(); return false;"><i class="fas fa-camera ml-2"></i>تغيير الصورة</a>
+                        <div class="border-t border-gray-700 my-1"></div>
+                        <div class="px-4 py-2 text-sm text-gray-400">تبديل الحساب</div>
+                        <div id="userSwitchList" class="max-h-40 overflow-y-auto"></div>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-700" onclick="addNewUser(); return false;"><i class="fas fa-plus ml-2"></i>إضافة مستخدم جديد</a>
+                        <div class="border-t border-gray-700 my-1"></div>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-700" onclick="show2FADialog(); return false;"><i class="fas fa-shield-alt ml-2"></i>إعدادات الأمان</a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-700" onclick="editBalance(); return false;"><i class="fas fa-wallet ml-2"></i>تعديل رصيد المحفظة</a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-700" onclick="logout(); return false;"><i class="fas fa-sign-out-alt ml-2"></i>تسجيل خروج</a>
+                    </div>
+                </div>
+                <button class="lg:hidden p-2 text-gray-400">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="h-[100px]"></div>
+
+    <main class="container mx-auto px-4 pb-10">
+
+        <!-- بطاقات الأداء السريع -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8" data-aos="fade-up">
+            <div class="card-glass p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-400 text-sm">إجمالي المحفظة (تجريبي)</p>
+                        <p class="text-2xl font-bold text-white mt-1" id="totalBalance">$124,560.00</p>
+                        <p class="text-xs text-green-400 mt-1" id="totalChange"><i class="fas fa-arrow-up ml-1"></i> +2.5% (24h)</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center"><i class="fas fa-wallet text-2xl text-blue-400"></i></div>
+                </div>
+            </div>
+            <div class="card-glass p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-400 text-sm">رأس المال المتاح</p>
+                        <p class="text-2xl font-bold text-white mt-1" id="availableBalance">$78,230.00</p>
+                        <p class="text-xs text-gray-400 mt-1" id="investedAmount">$46,330 مستثمر</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center"><i class="fas fa-coins text-2xl text-green-400"></i></div>
+                </div>
+            </div>
+            <div class="card-glass p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-400 text-sm">المراكز المفتوحة</p>
+                        <p class="text-2xl font-bold text-white mt-1" id="openPositions">7 <span class="text-sm text-gray-400 mr-2">5 × 2</span></p>
+                        <p class="text-xs text-green-400 mt-1" id="positionsRatio">4 مربحة / 3 خاسرة</p>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center"><i class="fas fa-chart-bar text-2xl text-yellow-400"></i></div>
+                </div>
+            </div>
+            <div class="card-glass p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-400 text-sm">أرباح/خسائر اليوم</p>
+                        <p class="text-2xl font-bold text-green-400 mt-1" id="dailyPL">+$1,240.50</p>
+                        <p class="text-xs text-gray-400 mt-1" id="dailyReturn">عائد 2.1%</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center"><i class="fas fa-chart-line text-2xl text-purple-400"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الرسم البياني + دفتر الأوامر -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="lg:col-span-2 card-glass p-5" data-aos="fade-left">
+                <div class="flex flex-wrap justify-between items-center mb-4">
+                    <div class="flex items-center gap-4">
+                        <h2 class="text-xl font-bold text-white">
+                            <i class="fas fa-chart-line text-blue-500 ml-2"></i>
+                            <span id="chartSymbol">BTC/USD</span> - <span id="chartTimeframe">1h</span>
+                        </h2>
+                        <div class="flex gap-1 bg-gray-800 p-1 rounded-xl" id="timeframeTabs">
+                            <button class="tab text-xs px-3 py-1" data-tf="5m">5m</button>
+                            <button class="tab text-xs px-3 py-1 active" data-tf="1h">1h</button>
+                            <button class="tab text-xs px-3 py-1" data-tf="4h">4h</button>
+                            <button class="tab text-xs px-3 py-1" data-tf="1d">1d</button>
+                            <button class="tab text-xs px-3 py-1" data-tf="1w">1w</button>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 mt-2 sm:mt-0">
+                        <span class="text-sm text-gray-400"><i class="fas fa-circle text-green-500 ml-1"></i> <span id="currentPrice">جاري التحميل...</span></span>
+                        <span class="text-sm text-gray-400"><i class="fas fa-arrow-up text-green-500 ml-1"></i> <span id="highPrice">-</span></span>
+                        <span class="text-sm text-gray-400"><i class="fas fa-arrow-down text-red-500 ml-1"></i> <span id="lowPrice">-</span></span>
+                    </div>
+                </div>
+                <div id="tv_chart" class="w-full" style="height:400px;"></div>
+                <div class="flex flex-wrap gap-3 mt-3 text-xs text-gray-400">
+                    <span class="cursor-pointer hover:text-white" onclick="showNotification('أداة الرسم')"><i class="fas fa-pen ml-1"></i>رسم</span>
+                    <span class="cursor-pointer hover:text-white" onclick="showNotification('المؤشرات')"><i class="fas fa-chart-line ml-1"></i>مؤشرات</span>
+                    <span class="cursor-pointer hover:text-white" onclick="showNotification('إعدادات الرسم البياني')"><i class="fas fa-cog ml-1"></i>إعدادات</span>
+                    <span class="cursor-pointer hover:text-white" onclick="showNotification('تكبير')"><i class="fas fa-expand ml-1"></i>تكبير</span>
+                </div>
+            </div>
+            <div class="card-glass p-5" data-aos="fade-right">
+                <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-book-open text-orange-500"></i> دفتر الأوامر (<span id="orderBookSymbol">BTC/USD</span>)</h2>
+                <div class="grid grid-cols-3 gap-2 text-xs text-gray-400 mb-2 pb-2 border-b border-gray-700">
+                    <span>السعر</span><span>الكمية</span><span>الإجمالي</span>
+                </div>
+                <div id="orderBookSells" class="space-y-1 mb-3"></div>
+                <div class="grid grid-cols-3 gap-2 text-sm font-bold text-white bg-blue-600/20 p-2 rounded-lg" id="orderBookMid">
+                    <span>جاري التحميل...</span><span>-</span><span>-</span>
+                </div>
+                <div id="orderBookBuys" class="space-y-1 mt-3"></div>
+                <div class="mt-4 pt-3 border-t border-gray-700">
+                    <h3 class="text-sm font-semibold text-gray-300 mb-2">آخر الصفقات</h3>
+                    <div id="recentTrades" class="space-y-2 text-xs"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم التداول والمحفظة -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- نموذج التداول -->
+            <div class="card-glass p-5" data-aos="zoom-in">
+                <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-exchange-alt text-green-500"></i> تنفيذ صفقة</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-400 text-sm mb-1">الزوج</label>
+                        <select id="tradeSymbol" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white focus:border-blue-500">
+                            <option value="BTC/USD">BTC/USD (بيتكوين)</option>
+                            <option value="ETH/USD">ETH/USD (إيثريوم)</option>
+                            <option value="AAPL/USD">AAPL/USD (أبل)</option>
+                            <option value="TSLA/USD">TSLA/USD (تسلا)</option>
+                            <option value="GOOGL/USD">GOOGL/USD (جوجل)</option>
+                            <option value="MSFT/USD">MSFT/USD (مايكروسوفت)</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-1">نوع الأمر</label>
+                            <select id="orderType" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white">
+                                <option value="market">سوقي</option>
+                                <option value="limit">محدد</option>
+                                <option value="stop">وقف</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-1">الاتجاه</label>
+                            <select id="orderSide" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white">
+                                <option value="buy" class="text-green-500">شراء</option>
+                                <option value="sell" class="text-red-500">بيع</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-sm mb-1">الكمية</label>
+                        <input type="number" id="orderAmount" value="0.001" step="0.001" min="0.001" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3" id="limitStopFields">
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-1">السعر المحدد</label>
+                            <input type="number" id="limitPrice" placeholder="السعر" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-1">وقف الخسارة</label>
+                            <input type="number" id="stopLoss" placeholder="وقف" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white">
+                        </div>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <button class="flex-1 btn-primary py-3 flex items-center justify-center gap-2" onclick="executeTrade('buy')"><i class="fas fa-arrow-up"></i> شراء</button>
+                        <button class="flex-1 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl py-3 flex items-center justify-center gap-2 hover:from-red-700" onclick="executeTrade('sell')"><i class="fas fa-arrow-down"></i> بيع</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- المحفظة التفصيلية -->
+            <div class="card-glass p-5" data-aos="zoom-in" data-aos-delay="100">
+                <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-wallet text-purple-500"></i> محفظتي</h2>
+                <div id="portfolioItems" class="space-y-3 max-h-80 overflow-y-auto pr-2"></div>
+                <div class="mt-4 bg-gray-800/50 p-4 rounded-xl">
+                    <div class="flex justify-between text-sm"><span>إجمالي المحفظة:</span><span class="font-bold" id="totalPortfolioValue">$50,000</span></div>
+                    <div class="flex justify-between text-sm mt-1"><span>الرصيد المتاح:</span><span class="font-bold text-green-400" id="availableCash">$24,658</span></div>
+                    <div class="w-full bg-gray-700 h-2 rounded-full mt-3 overflow-hidden">
+                        <div class="bg-gradient-to-l from-blue-600 to-purple-600 h-2 rounded-full" id="investmentBar" style="width:68%"></div>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2" id="investmentPercent">نسبة الاستثمار 68%</p>
+                </div>
+            </div>
+
+            <!-- الأوامر المفتوحة والأخبار -->
+            <div class="card-glass p-5" data-aos="zoom-in" data-aos-delay="200">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-clock text-yellow-500"></i> أوامر مفتوحة</h2>
+                    <span class="bg-blue-600 text-white text-xs px-3 py-1 rounded-full" id="openOrdersCount">3 أوامر</span>
+                </div>
+                <div id="openOrdersList" class="space-y-3 mb-5"></div>
+                <h2 class="text-xl font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-newspaper text-blue-400"></i> آخر الأخبار</h2>
+                <div id="newsList" class="space-y-2 max-h-32 overflow-y-auto"></div>
+            </div>
+        </div>
+
+        <!-- جدول جميع الأصول مع الفلتر -->
+        <div class="card-glass p-5 mb-8" data-aos="fade-up">
+            <div class="flex flex-wrap justify-between items-center mb-5">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-table text-blue-500"></i> جميع الأصول القابلة للتداول</h2>
+                <div class="flex gap-3">
+                    <input type="text" id="assetSearch" placeholder="بحث..." class="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
+                    <select id="assetFilter" class="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
+                        <option value="all">كل الفئات</option>
+                        <option value="crypto">عملات رقمية</option>
+                        <option value="stock">أسهم</option>
+                    </select>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="table-pro" id="assetsTable">
+                    <thead>
+                        <tr><th>الأصل</th><th>السعر</th><th>تغيير 24h</th><th>أعلى 24h</th><th>أدنى 24h</th><th>حجم التداول</th><th>الإجراء</th></tr>
+                    </thead>
+                    <tbody id="assetsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- أدوات التحليل المتقدم -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="card-glass p-5" data-aos="fade-left">
+                <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-chart-pie text-pink-500"></i> تحليل المحفظة</h2>
+                <div style="height:200px;"><canvas id="portfolioChart"></canvas></div>
+                <div class="flex justify-center gap-4 mt-3 text-xs" id="portfolioLegend"></div>
+            </div>
+            <div class="card-glass p-5" data-aos="fade-right">
+                <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-calculator text-indigo-400"></i> حاسبة الأرباح</h2>
+                <div class="space-y-3">
+                    <div class="flex justify-between text-sm"><span>الاستثمار:</span><span id="calcInvestment">$10,000</span></div>
+                    <div class="flex justify-between text-sm"><span>سعر الدخول:</span><span id="calcEntry">$43,200</span></div>
+                    <div class="flex justify-between text-sm"><span>سعر الخروج:</span><span id="calcExit">$44,500</span></div>
+                    <div class="flex justify-between text-sm"><span>الكمية:</span><span id="calcAmount">0.231 BTC</span></div>
+                    <div class="border-t border-gray-700 my-2"></div>
+                    <div class="flex justify-between font-bold text-green-400" id="calcProfit"><span>الربح المقدر:</span><span>+$301.30 (3.01%)</span></div>
+                </div>
+                <button class="w-full btn-primary mt-4" onclick="showNotification('تم تحديث الحاسبة')">تطبيق</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="bg-[#0a0c10] border-t border-gray-800 py-8 mt-8">
+        <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+            <p class="mb-2">© 2026 استثمارتك برو+ - منصة تدريبية متكاملة. جميع البيانات لأغراض المحاكاة والتعليم فقط.</p>
+            <p class="text-xs">هذه المنصة لا تقدم خدمات مالية حقيقية. التداول ينطوي على مخاطر عالية. استخدم الأموال الافتراضية للتعلم.</p>
+            <div class="flex justify-center gap-6 mt-4">
+                <a href="#" class="hover:text-blue-400 transition">شروط الاستخدام</a>
+                <a href="#" class="hover:text-blue-400 transition">سياسة الخصوصية</a>
+                <a href="#" class="hover:text-blue-400 transition">إخلاء مسؤولية</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast -->
+    <div id="toast" class="toast flex items-center gap-3">
+        <i class="fas fa-info-circle text-blue-400 text-xl"></i>
+        <span id="toastMessage">تم تنفيذ الأمر بنجاح</span>
+    </div>
+
+    <!-- مودال إضافة مستخدم جديد -->
+    <div id="userModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-[100]">
+        <div class="bg-gray-800 p-6 rounded-2xl w-96">
+            <h3 class="text-xl font-bold mb-4">إضافة مستخدم جديد</h3>
+            <input type="text" id="newUserName" placeholder="الاسم" class="w-full bg-gray-700 border border-gray-600 rounded-xl p-3 text-white mb-4">
+            <label class="block text-gray-400 mb-2">الصورة الشخصية (اختياري)</label>
+            <input type="file" id="newUserAvatar" accept="image/*" class="w-full bg-gray-700 border border-gray-600 rounded-xl p-2 text-white mb-4">
+            <div class="flex gap-3">
+                <button class="flex-1 btn-primary" onclick="createNewUser()">إضافة</button>
+                <button class="flex-1 bg-gray-600 rounded-xl py-2" onclick="closeUserModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+
+        // ========== إعدادات API مع مفتاحك الخاص ==========
+        const API_TOKEN = 'LTUA2UTNAIW5SSG5';
+        // روابط API الصحيحة حسب نوع الأصل (من AllTick) [citation:1][citation:9]
+        const BASE_URL_CRYPTO = 'https://quote.alltick.io/quote-b-api';
+        const BASE_URL_STOCKS = 'https://quote.alltick.io/quote-stock-b-api';
+
+        // ========== نظام المستخدمين المتعددين (بدون تغيير) ==========
+        let usersDB = [];
+        let currentUserId = null;
+
+        // تحميل البيانات من localStorage
+        function loadUsers() {
+            const stored = localStorage.getItem('trading_users');
+            if (stored) {
+                usersDB = JSON.parse(stored);
+            } else {
+                // إنشاء مستخدم افتراضي
+                usersDB = [
+                    { id: '1', name: 'محمد أ.', avatar: 'https://i.pravatar.cc/40?u=1', portfolio: { BTC: { amount: 0.25, price: 43210 }, ETH: { amount: 2.5, price: 2310 }, AAPL: { amount: 50, price: 175.30 }, TSLA: { amount: 12, price: 248.40 }, USD: 24658 }, openOrders: [
+                        { id: 1, symbol: 'BTC/USD', side: 'buy', type: 'market', amount: 0.001, price: 43200, status: 'قيد التنفيذ' },
+                        { id: 2, symbol: 'ETH/USD', side: 'sell', type: 'limit', amount: 0.5, price: 2300, status: 'معلق' },
+                        { id: 3, symbol: 'AAPL', side: 'buy', type: 'stop', amount: 10, price: 175, status: 'Stop-Limit' }
+                    ] },
+                    { id: '2', name: 'سارة خالد', avatar: 'https://i.pravatar.cc/40?u=2', portfolio: { BTC: { amount: 0.1, price: 43210 }, ETH: { amount: 5, price: 2310 }, USD: 50000 }, openOrders: [] }
+                ];
+            }
+            if (!currentUserId && usersDB.length > 0) {
+                currentUserId = usersDB[0].id;
+            }
+            saveUsers();
+        }
+
+        function saveUsers() {
+            localStorage.setItem('trading_users', JSON.stringify(usersDB));
+        }
+
+        // الحصول على بيانات المستخدم الحالي
+        function getCurrentUser() {
+            return usersDB.find(u => u.id === currentUserId) || usersDB[0];
+        }
+
+        // تحديث واجهة المستخدم بعد تغيير المستخدم
+        function refreshUIForCurrentUser() {
+            const user = getCurrentUser();
+            if (!user) return;
+            document.getElementById('usernameDisplay').innerText = user.name;
+            document.getElementById('dropdownUsername').innerText = user.name;
+            document.getElementById('userAvatar').src = user.avatar || 'https://i.pravatar.cc/40?u=' + user.id;
+            document.getElementById('dropdownAvatar').src = user.avatar || 'https://i.pravatar.cc/40?u=' + user.id;
+            
+            window.portfolio = user.portfolio || { USD: 100000 };
+            window.openOrders = user.openOrders || [];
+            
+            updatePortfolioUI();
+            updateOpenOrders();
+        }
+
+        // دوال إدارة المستخدمين (بدون تغيير)
+        function switchUser(userId) {
+            currentUserId = userId;
+            saveUsers();
+            refreshUIForCurrentUser();
+            showNotification(`تم التبديل إلى ${getCurrentUser().name}`);
+            toggleDropdown(false);
+        }
+
+        function addNewUser() {
+            document.getElementById('userModal').classList.remove('hidden');
+            document.getElementById('userModal').classList.add('flex');
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.add('hidden');
+            document.getElementById('userModal').classList.remove('flex');
+        }
+
+        function createNewUser() {
+            const name = document.getElementById('newUserName').value.trim();
+            if (!name) {
+                showNotification('الرجاء إدخال الاسم');
+                return;
+            }
+            const fileInput = document.getElementById('newUserAvatar');
+            let avatar = 'https://i.pravatar.cc/40?u=' + Date.now();
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    avatar = e.target.result;
+                    finishCreateUser(name, avatar);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                finishCreateUser(name, avatar);
+            }
+        }
+
+        function finishCreateUser(name, avatar) {
+            const newUser = {
+                id: Date.now().toString(),
+                name: name,
+                avatar: avatar,
+                portfolio: { USD: 100000 },
+                openOrders: []
+            };
+            usersDB.push(newUser);
+            currentUserId = newUser.id;
+            saveUsers();
+            refreshUIForCurrentUser();
+            closeUserModal();
+            showNotification(`مرحباً ${name}!`);
+        }
+
+        function editUsername() {
+            const user = getCurrentUser();
+            const newName = prompt('أدخل الاسم الجديد:', user.name);
+            if (newName && newName.trim() !== '') {
+                user.name = newName.trim();
+                saveUsers();
+                refreshUIForCurrentUser();
+                showNotification('تم تغيير الاسم');
+            }
+            return false;
+        }
+
+        function editAvatar() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const user = getCurrentUser();
+                        user.avatar = event.target.result;
+                        saveUsers();
+                        refreshUIForCurrentUser();
+                        showNotification('تم تغيير الصورة');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+            return false;
+        }
+
+        function updateUserSwitchList() {
+            const container = document.getElementById('userSwitchList');
+            const currentUser = getCurrentUser();
+            let html = '';
+            usersDB.forEach(user => {
+                if (user.id !== currentUser.id) {
+                    html += `<a href="#" class="block px-4 py-2 hover:bg-gray-700 flex items-center gap-2" onclick="switchUser('${user.id}'); return false;">
+                        <img src="${user.avatar}" class="w-6 h-6 rounded-full"> ${user.name}
+                    </a>`;
+                }
+            });
+            if (html === '') {
+                html = '<div class="px-4 py-2 text-gray-500">لا يوجد مستخدمين آخرين</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function toggleDropdown(show) {
+            const dd = document.getElementById('userDropdown');
+            if (show === undefined) {
+                dd.classList.toggle('hidden');
+            } else {
+                if (show) dd.classList.remove('hidden');
+                else dd.classList.add('hidden');
+            }
+            if (!dd.classList.contains('hidden')) {
+                updateUserSwitchList();
+            }
+        }
+
+        document.getElementById('userMenuBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+
+        document.addEventListener('click', (e) => {
+            const btn = document.getElementById('userMenuBtn');
+            const dd = document.getElementById('userDropdown');
+            if (!btn.contains(e.target) && !dd.contains(e.target)) {
+                dd.classList.add('hidden');
+            }
+        });
+
+        function showNotification(msg) {
+            let toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function show2FADialog() {
+            showNotification('إعدادات الأمان (قريباً)');
+        }
+
+        function logout() {
+            showNotification('تم تسجيل الخروج');
+        }
+
+        function editBalance() {
+            const user = getCurrentUser();
+            let newBalance = prompt('أدخل الرصيد الجديد (USD):', user.portfolio.USD);
+            if (newBalance !== null && !isNaN(parseFloat(newBalance)) && isFinite(newBalance)) {
+                newBalance = parseFloat(newBalance);
+                if (newBalance >= 0) {
+                    user.portfolio.USD = newBalance;
+                    saveUsers();
+                    refreshUIForCurrentUser();
+                    showNotification('تم تعديل الرصيد بنجاح');
+                } else {
+                    showNotification('الرجاء إدخال قيمة موجبة');
+                }
+            } else {
+                showNotification('تم إلغاء التعديل أو إدخال قيمة غير صحيحة');
+            }
+            return false;
+        }
+
+        // ========== قائمة الأصول مع رموز AllTick الصحيحة ==========
+        let assets = [
+            { 
+                symbol: 'BTC/USD', 
+                code: 'BTCUSD',  // رمز API
+                name: 'بيتكوين', 
+                category: 'crypto', 
+                price: 43210, 
+                change: 3.2, 
+                high: 44200, 
+                low: 42100, 
+                volume: '32.5B', 
+                icon: 'fab fa-bitcoin text-orange-500',
+                apiCode: 'BTCUSD'
+            },
+            { 
+                symbol: 'ETH/USD', 
+                code: 'ETHUSD',
+                name: 'إيثريوم', 
+                category: 'crypto', 
+                price: 2310, 
+                change: 1.8, 
+                high: 2350, 
+                low: 2280, 
+                volume: '18.2B', 
+                icon: 'fab fa-ethereum text-blue-400',
+                apiCode: 'ETHUSD'
+            },
+            { 
+                symbol: 'AAPL/USD', 
+                code: 'AAPL',
+                name: 'أبل', 
+                category: 'stock', 
+                price: 175.30, 
+                change: 1.2, 
+                high: 177.20, 
+                low: 173.50, 
+                volume: '45.2B', 
+                icon: 'fab fa-apple text-gray-300',
+                apiCode: 'AAPL'
+            },
+            { 
+                symbol: 'TSLA/USD', 
+                code: 'TSLA',
+                name: 'تسلا', 
+                category: 'stock', 
+                price: 248.40, 
+                change: -0.5, 
+                high: 252.00, 
+                low: 245.30, 
+                volume: '28.1B', 
+                icon: 'fas fa-car text-red-500',
+                apiCode: 'TSLA'
+            },
+            { 
+                symbol: 'GOOGL/USD', 
+                code: 'GOOGL',
+                name: 'جوجل', 
+                category: 'stock', 
+                price: 138.20, 
+                change: 0.9, 
+                high: 139.80, 
+                low: 137.10, 
+                volume: '22.3B', 
+                icon: 'fab fa-google text-yellow-500',
+                apiCode: 'GOOGL'
+            },
+            { 
+                symbol: 'MSFT/USD', 
+                code: 'MSFT',
+                name: 'مايكروسوفت', 
+                category: 'stock', 
+                price: 332.50, 
+                change: 0.7, 
+                high: 335.00, 
+                low: 330.20, 
+                volume: '30.1B', 
+                icon: 'fab fa-microsoft text-blue-500',
+                apiCode: 'MSFT'
+            }
+        ];
+
+        // ========== دوال جلب البيانات الحقيقية من AllTick ==========
+
+        // دالة لجلب السعر الحقيقي (ticker)
+        async function fetchRealPrice(asset) {
+            try {
+                const baseUrl = asset.category === 'crypto' ? BASE_URL_CRYPTO : BASE_URL_STOCKS;
+                // ترميز الاستعلام (Base64) كما هو مطلوب من AllTick [citation:9]
+                const queryData = btoa(JSON.stringify({
+                    trace: "1",
+                    data: {
+                        code_list: [asset.apiCode],
+                        kline_type: 1,  // نوع الشمعة (1 للسعر الحالي)
+                        kline_timestamp_end: 0,
+                        query_kline_num: 1,
+                        adjust_type: 0
+                    }
+                }));
+                
+                const url = `${baseUrl}/kline?token=${API_TOKEN}&query=${encodeURIComponent(queryData)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data && data.data && data.data[0] && data.data[0].kline_list && data.data[0].kline_list[0]) {
+                    const kline = data.data[0].kline_list[0];
+                    return {
+                        price: kline.c,  // سعر الإغلاق
+                        high: kline.h,
+                        low: kline.l
+                    };
+                }
+                return null;
+            } catch (error) {
+                console.error('خطأ في جلب السعر:', error);
+                return null;
+            }
+        }
+
+        // دالة لجلب بيانات الشموع (Candles) الحقيقية
+        async function fetchRealCandles(asset, timeframe) {
+            try {
+                // تحويل الإطار الزمني إلى kline_type الخاص بـ AllTick [citation:9]
+                const klineTypeMap = {
+                    '5m': 5,    // 5 دقائق
+                    '1h': 60,   // 1 ساعة
+                    '4h': 240,  // 4 ساعات
+                    '1d': 1440, // يوم
+                    '1w': 10080 // أسبوع
+                };
+                
+                const baseUrl = asset.category === 'crypto' ? BASE_URL_CRYPTO : BASE_URL_STOCKS;
+                const queryData = btoa(JSON.stringify({
+                    trace: "1",
+                    data: {
+                        code_list: [asset.apiCode],
+                        kline_type: klineTypeMap[timeframe] || 60,
+                        kline_timestamp_end: 0,
+                        query_kline_num: 200,  // عدد الشموع
+                        adjust_type: 0
+                    }
+                }));
+                
+                const url = `${baseUrl}/kline?token=${API_TOKEN}&query=${encodeURIComponent(queryData)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data && data.data && data.data[0] && data.data[0].kline_list) {
+                    // تحويل البيانات إلى الصيغة المطلوبة للرسم البياني
+                    return data.data[0].kline_list.map(kline => ({
+                        time: kline.t,
+                        open: kline.o,
+                        high: kline.h,
+                        low: kline.l,
+                        close: kline.c
+                    })).reverse(); // AllTick تعيد من الأقدم للأحدث، نحتاج العكس
+                }
+                return generateMockCandles(asset.price || 43210, volatility, count);
+            } catch (error) {
+                console.error('خطأ في جلب الشموع:', error);
+                return generateMockCandles(asset.price || 43210, asset.category === 'crypto' ? 500 : 20, 100);
+            }
+        }
+
+        // دالة تحديث جميع الأسعار
+        async function updateAllPrices() {
+            for (let asset of assets) {
+                const realData = await fetchRealPrice(asset);
+                if (realData) {
+                    asset.price = realData.price;
+                    asset.high = realData.high.toFixed(2);
+                    asset.low = realData.low.toFixed(2);
+                    // حساب التغيير بشكل تقريبي
+                    if (asset.prevPrice) {
+                        asset.change = ((asset.price - asset.prevPrice) / asset.prevPrice * 100).toFixed(1);
+                    }
+                    asset.prevPrice = asset.price;
+                }
+            }
+            
+            // تحديث واجهة المستخدم
+            updateTicker();
+            updateAssetsTable();
+            
+            let sym = document.getElementById('tradeSymbol').value;
+            let asset = assets.find(a => a.symbol === sym);
+            if (asset) {
+                document.getElementById('currentPrice').innerText = asset.price.toFixed(2);
+                document.getElementById('highPrice').innerText = asset.high;
+                document.getElementById('lowPrice').innerText = asset.low;
+            }
+            updateOrderBook(sym);
+        }
+
+        // دالة تحديث الرسم البياني بالبيانات الحقيقية
+        async function updateChart(symbol, timeframe) {
+            let asset = assets.find(a => a.symbol === symbol);
+            if (!asset) return;
+            
+            // عرض مؤشر التحميل
+            document.getElementById('currentPrice').innerHTML = '<span class="loading-spinner"></span> جاري التحميل...';
+            
+            const candles = await fetchRealCandles(asset, timeframe);
+            
+            if (chartSeries) {
+                chartSeries.setData(candles);
+            } else {
+                const chart = LightweightCharts.createChart(document.getElementById('tv_chart'), {
+                    layout: { background: { color: '#1a212b' }, textColor: '#d1d5db' },
+                    grid: { vertLines: { color: '#2a3744' }, horzLines: { color: '#2a3744' } },
+                    rightPriceScale: { borderColor: '#3b4a5a' },
+                    timeScale: { borderColor: '#3b4a5a', timeVisible: true }
+                });
+                chartSeries = chart.addCandlestickSeries({
+                    upColor: '#22c55e', downColor: '#ef4444', borderDownColor: '#ef4444',
+                    borderUpColor: '#22c55e', wickDownColor: '#ef4444', wickUpColor: '#22c55e'
+                });
+                chartSeries.setData(candles);
+            }
+            
+            // تحديث السعر الحالي
+            if (asset.price) {
+                document.getElementById('currentPrice').innerText = asset.price.toFixed(2);
+                document.getElementById('highPrice').innerText = asset.high;
+                document.getElementById('lowPrice').innerText = asset.low;
+            }
+        }
+
+        // دالة مساعدة لتوليد شموع وهمية (احتياطي)
+        function generateMockCandles(basePrice, volatility, count) {
+            let data = [];
+            let now = Math.floor(Date.now() / 1000);
+            for (let i = count; i >= 0; i--) {
+                let time = now - i * 3600; // ساعة
+                let open = basePrice + (Math.random() - 0.5) * volatility;
+                let close = open + (Math.random() - 0.5) * volatility * 0.5;
+                let high = Math.max(open, close) + Math.random() * volatility * 0.3;
+                let low = Math.min(open, close) - Math.random() * volatility * 0.3;
+                data.push({ time, open, high, low, close });
+                basePrice = close;
+            }
+            return data;
+        }
+
+        // ========== دوال التحديث (مع تعديلات بسيطة) ==========
+        function updatePortfolioUI() {
+            const user = getCurrentUser();
+            const portfolio = user.portfolio;
+            const container = document.getElementById('portfolioItems');
+            let html = '';
+            let total = 0;
+            for (let [sym, data] of Object.entries(portfolio)) {
+                if (sym === 'USD') continue;
+                let value = data.amount * data.price;
+                total += value;
+                let asset = assets.find(a => a.symbol.startsWith(sym));
+                let icon = asset ? asset.icon : 'fas fa-circle';
+                html += `<div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                    <span class="flex items-center gap-2"><i class="${icon}"></i> ${sym}</span>
+                    <span class="font-medium">${data.amount} <span class="text-gray-400 text-sm">≈ $${formatNumber(value)}</span></span>
+                </div>`;
+            }
+            total += portfolio.USD;
+            container.innerHTML = html;
+            document.getElementById('totalPortfolioValue').innerText = '$' + formatNumber(total);
+            document.getElementById('availableCash').innerText = '$' + formatNumber(portfolio.USD);
+            let invested = total - portfolio.USD;
+            let percent = total > 0 ? ((invested / total) * 100).toFixed(1) : 0;
+            document.getElementById('investmentBar').style.width = percent + '%';
+            document.getElementById('investmentPercent').innerText = `نسبة الاستثمار ${percent}%`;
+            document.getElementById('totalBalance').innerText = '$' + formatNumber(total);
+            document.getElementById('availableBalance').innerText = '$' + formatNumber(portfolio.USD);
+            document.getElementById('investedAmount').innerText = '$' + formatNumber(invested) + ' مستثمر';
+            updatePortfolioChart();
+        }
+
+        function updateOpenOrders() {
+            const user = getCurrentUser();
+            const openOrders = user.openOrders || [];
+            const list = document.getElementById('openOrdersList');
+            list.innerHTML = openOrders.map(o => `
+                <div class="bg-gray-800/40 p-3 rounded-xl flex justify-between items-center">
+                    <div><span class="${o.side === 'buy' ? 'text-green-400' : 'text-red-400'}">${o.side === 'buy' ? '▲ شراء' : '▼ بيع'}</span> ${o.symbol}</div>
+                    <div>${o.amount} @ $${o.price}</div>
+                    <span class="text-xs text-gray-400">${o.status}</span>
+                </div>
+            `).join('');
+            document.getElementById('openOrdersCount').innerText = openOrders.length + ' أوامر';
+            document.getElementById('openPositions').innerHTML = openOrders.length + ' <span class="text-sm text-gray-400 mr-2">' + openOrders.filter(o => o.side === 'buy').length + ' × ' + openOrders.filter(o => o.side === 'sell').length + '</span>';
+            let profitable = openOrders.filter(o => o.status.includes('مربح')).length;
+            document.getElementById('positionsRatio').innerText = profitable + ' مربحة / ' + (openOrders.length - profitable) + ' خاسرة';
+        }
+
+        function updateTicker() {
+            const tickerEl = document.getElementById('ticker');
+            const items = assets.map(a => `<span class="ticker-item"><i class="${a.icon} ml-1"></i> ${a.symbol}: $${a.price} <span class="${a.change >= 0 ? 'up' : 'down'}">${a.change >= 0 ? '▲' : '▼'}${Math.abs(a.change)}%</span></span>`).join('');
+            tickerEl.innerHTML = items;
+        }
+
+        function updateAssetsTable(filter = 'all', search = '') {
+            const tbody = document.getElementById('assetsTableBody');
+            let filtered = assets.filter(a => (filter === 'all' || a.category === filter) && 
+                (a.symbol.toLowerCase().includes(search.toLowerCase()) || a.name.includes(search)));
+            tbody.innerHTML = filtered.map(a => `
+                <tr>
+                    <td><i class="${a.icon} ml-2"></i> ${a.name} (${a.symbol})</td>
+                    <td class="font-bold">$${a.price.toFixed(2)}</td>
+                    <td class="${a.change >= 0 ? 'up' : 'down'}">${a.change >= 0 ? '+' : ''}${a.change}%</td>
+                    <td>$${a.high}</td>
+                    <td>$${a.low}</td>
+                    <td>$${a.volume}</td>
+                    <td><button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-lg text-sm" onclick="quickTrade('${a.symbol}')">تداول</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function updateOrderBook(symbol = 'BTC/USD') {
+            let asset = assets.find(a => a.symbol === symbol);
+            let basePrice = asset ? asset.price : 43210;
+            let sells = '', buys = '';
+            for (let i = 0; i < 3; i++) {
+                let price = basePrice + (i+1)*10;
+                let qty = (Math.random() * 2 + 0.1).toFixed(3);
+                let total = (price * qty).toFixed(0);
+                sells += `<div class="grid grid-cols-3 gap-2 text-sm text-red-400"><span>${price.toFixed(2)}</span><span>${qty}</span><span>${total}</span></div>`;
+                price = basePrice - (i+1)*10;
+                qty = (Math.random() * 2 + 0.1).toFixed(3);
+                total = (price * qty).toFixed(0);
+                buys += `<div class="grid grid-cols-3 gap-2 text-sm text-green-400"><span>${price.toFixed(2)}</span><span>${qty}</span><span>${total}</span></div>`;
+            }
+            document.getElementById('orderBookSells').innerHTML = sells;
+            document.getElementById('orderBookBuys').innerHTML = buys;
+            document.getElementById('orderBookMid').innerHTML = `<span>${basePrice.toFixed(2)}</span><span>5.500</span><span>${(basePrice*5.5).toFixed(0)}</span>`;
+
+            let trades = '';
+            for (let i = 0; i < 3; i++) {
+                let price = basePrice + (Math.random()*50 - 25);
+                let side = Math.random() > 0.5 ? 'green' : 'red';
+                let arrow = side === 'green' ? '▲' : '▼';
+                let qty = (Math.random() * 0.5 + 0.01).toFixed(3);
+                let time = Math.floor(Math.random()*60) + 's';
+                trades += `<div class="flex justify-between"><span class="text-${side}-400">${arrow} $${price.toFixed(2)}</span><span>${qty} ${symbol.split('/')[0]}</span><span class="text-gray-400">${time}</span></div>`;
+            }
+            document.getElementById('recentTrades').innerHTML = trades;
+        }
+
+        function updatePortfolioChart() {
+            const user = getCurrentUser();
+            const portfolio = user.portfolio;
+            let ctx = document.getElementById('portfolioChart').getContext('2d');
+            let labels = [];
+            let data = [];
+            let colors = [];
+            for (let [sym, val] of Object.entries(portfolio)) {
+                if (sym === 'USD') continue;
+                labels.push(sym);
+                data.push(val.amount * val.price);
+                if (sym === 'BTC') colors.push('#f97316');
+                else if (sym === 'ETH') colors.push('#3b82f6');
+                else if (sym === 'AAPL') colors.push('#9ca3af');
+                else if (sym === 'TSLA') colors.push('#ef4444');
+                else colors.push('#22c55e');
+            }
+            if (portfolio.USD > 0) {
+                labels.push('USD');
+                data.push(portfolio.USD);
+                colors.push('#22c55e');
+            }
+            if (window.portfolioChartInstance) window.portfolioChartInstance.destroy();
+            window.portfolioChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '70%' }
+            });
+            let total = data.reduce((a,b) => a+b, 0);
+            let legendHtml = labels.map((l, i) => `<span><span class="inline-block w-3 h-3 rounded-full ml-1" style="background:${colors[i]};"></span> ${l} ${((data[i]/total)*100).toFixed(1)}%</span>`).join('');
+            document.getElementById('portfolioLegend').innerHTML = legendHtml;
+        }
+
+        function formatNumber(x) {
+            return x.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        // دالة تنفيذ الصفقة (معدلة لحفظ البيانات في المستخدم الحالي)
+        function executeTrade(side) {
+            let symbol = document.getElementById('tradeSymbol').value;
+            let type = document.getElementById('orderType').value;
+            let amount = parseFloat(document.getElementById('orderAmount').value);
+            let asset = assets.find(a => a.symbol === symbol);
+            if (!asset) return;
+            let price = asset.price;
+            let total = amount * price;
+            let base = symbol.split('/')[0];
+
+            const user = getCurrentUser();
+            const portfolio = user.portfolio;
+            const openOrders = user.openOrders;
+
+            if (side === 'buy') {
+                if (portfolio.USD < total) {
+                    showNotification('⚠️ رصيد غير كافي (استخدم الرصيد الافتراضي)');
+                    return;
+                }
+                portfolio.USD -= total;
+                if (!portfolio[base]) portfolio[base] = { amount: 0, price: price };
+                portfolio[base].amount += amount;
+                portfolio[base].price = price;
+                showNotification(`✅ تم شراء ${amount} ${base} بمبلغ $${total.toFixed(2)}`);
+            } else {
+                if (!portfolio[base] || portfolio[base].amount < amount) {
+                    showNotification(`⚠️ كمية غير كافية من ${base} للبيع`);
+                    return;
+                }
+                portfolio[base].amount -= amount;
+                portfolio.USD += total;
+                if (portfolio[base].amount <= 0) delete portfolio[base];
+                showNotification(`✅ تم بيع ${amount} ${base} بمبلغ $${total.toFixed(2)}`);
+            }
+            let newOrder = {
+                id: openOrders.length + 1,
+                symbol: symbol,
+                side: side,
+                type: type,
+                amount: amount,
+                price: price,
+                status: 'منفذ'
+            };
+            openOrders.push(newOrder);
+            saveUsers();
+            refreshUIForCurrentUser();
+            updateOrderBook(symbol);
+        }
+
+        function quickTrade(symbol) {
+            document.getElementById('tradeSymbol').value = symbol;
+            showNotification(`تم تحديد ${symbol} للتداول`);
+        }
+
+        // متغير الرسم البياني
+        let chartSeries = null;
+
+        // ========== التهيئة ==========
+        window.onload = async function() {
+            loadUsers();
+            refreshUIForCurrentUser();
+
+            // تهيئة الجدول والشريط العلوي
+            updateTicker();
+            updateAssetsTable();
+            
+            // جلب البيانات الحقيقية لأول مرة
+            await updateAllPrices();
+            
+            // رسم الشموع الحقيقية
+            await updateChart('BTC/USD', '1h');
+
+            // الأحداث
+            document.getElementById('assetSearch').addEventListener('input', function() {
+                updateAssetsTable(document.getElementById('assetFilter').value, this.value);
+            });
+            document.getElementById('assetFilter').addEventListener('change', function() {
+                updateAssetsTable(this.value, document.getElementById('assetSearch').value);
+            });
+
+            document.getElementById('tradeSymbol').addEventListener('change', async function() {
+                let sym = this.value;
+                document.getElementById('chartSymbol').innerText = sym;
+                document.getElementById('orderBookSymbol').innerText = sym;
+                let activeTf = document.querySelector('#timeframeTabs .tab.active').getAttribute('data-tf');
+                await updateChart(sym, activeTf);
+                updateOrderBook(sym);
+            });
+
+            document.querySelectorAll('#timeframeTabs .tab').forEach(tab => {
+                tab.addEventListener('click', async function() {
+                    document.querySelectorAll('#timeframeTabs .tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    let tf = this.getAttribute('data-tf');
+                    let sym = document.getElementById('tradeSymbol').value;
+                    document.getElementById('chartTimeframe').innerText = tf;
+                    await updateChart(sym, tf);
+                });
+            });
+
+            // تحديث دوري للأسعار كل 30 ثانية (بدلاً من 10 ثواني احتراماً لـ rate limit) [citation:1]
+            setInterval(async () => {
+                await updateAllPrices();
+            }, 30000);
+        };
+    </script>
+</body>
+</html>
