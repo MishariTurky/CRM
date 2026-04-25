@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>لوحة الأرباح | رسوم متغيرة وآيبان المشترك</title>
+    <title>لوحة الأرباح | بريد متكامل</title>
     
-    <!-- خطوط وأيقونات خارجية -->
+    <!-- الخطوط والأيقونات الخارجية -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <!-- ملف التنسيقات الخاص -->
+    <!-- مكتبة SheetJS للتصدير (اختياري) -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    
+    <!-- ملف التنسيقات -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -19,13 +22,37 @@
 <div class="dashboard">
     <div class="dashboard-header">
         <h1><i class="fas fa-chart-pie"></i> لوحة الأرباح</h1>
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <div class="date-badge"><i class="far fa-calendar-alt"></i> 20 أبريل 2026</div>
+            <button class="message-btn" id="toggleMailBtn"><i class="fas fa-envelope"></i> البريد <span class="badge-unread" id="mailBadge" style="display:none;">0</span></button>
             <button class="add-investor-btn" id="addInvestorBtn"><i class="fas fa-user-plus"></i><span>إضافة مستثمر</span></button>
             <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i><span>المظهر الداكن</span></button>
         </div>
     </div>
 
+    <!-- قسم البريد المضمّن -->
+    <div class="mail-inline-section" id="mailInlineSection">
+        <div class="mail-inline-header">
+            <h2><i class="fas fa-envelope-open-text"></i> البريد الإلكتروني</h2>
+            <button class="close-mail-btn" id="closeMailBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="mail-layout">
+            <div class="mail-sidebar">
+                <button class="active" data-folder="inbox"><i class="fas fa-inbox"></i> الوارد <span class="sidebar-count" id="inboxCount">0</span></button>
+                <button data-folder="sent"><i class="fas fa-paper-plane"></i> الصادر <span class="sidebar-count" id="sentCount">0</span></button>
+                <button data-folder="drafts"><i class="fas fa-file-alt"></i> المسودات <span class="sidebar-count" id="draftsCount">0</span></button>
+                <button data-folder="trash"><i class="fas fa-trash-alt"></i> المهملات <span class="sidebar-count" id="trashCount">0</span></button>
+                <button data-folder="starred"><i class="fas fa-star"></i> المميّزة</button>
+                <button id="composeNewBtn" style="margin-top:12px;"><i class="fas fa-pen"></i> رسالة جديدة</button>
+            </div>
+            <div class="mail-list-pane" id="mailListPane"></div>
+            <div class="mail-view-pane" id="mailViewPane">
+                <div class="mail-view-placeholder"><i class="fas fa-envelope"></i><p>اختر رسالة من القائمة</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الإحصائيات -->
     <div class="stats-grid">
         <div class="card">
             <div class="profit-header">
@@ -40,6 +67,7 @@
         </div>
     </div>
 
+    <!-- قسم العمليات -->
     <div class="search-section">
         <div class="search-header">
             <i class="fas fa-search-dollar"></i>
@@ -58,6 +86,7 @@
         </div>
     </div>
 
+    <!-- تفاصيل المشترك -->
     <div class="subscriber-details-panel" id="subscriberDetailsPanel">
         <div class="panel-header">
             <i class="fas fa-user-circle"></i>
@@ -91,7 +120,21 @@
     </div>
 </div>
 
-<!-- مودال مخصص للتنبيهات (بديل alert) -->
+<!-- مودال كتابة رسالة -->
+<div class="modal-overlay" id="composeModal">
+    <div class="modal-card">
+        <button class="modal-close" id="closeComposeBtn"><i class="fas fa-times"></i></button>
+        <div class="modal-header"><i class="fas fa-pen"></i><h3 id="composeModalTitle">رسالة جديدة</h3></div>
+        <form id="composeForm" class="compose-form">
+            <div class="form-group"><label>إلى (المستثمر)</label><select id="msgRecipient" required></select></div>
+            <div class="form-group"><label>الموضوع</label><input type="text" id="msgSubject" required></div>
+            <div class="form-group"><label>نص الرسالة</label><textarea id="msgBody" rows="5" required></textarea></div>
+            <button type="submit" class="btn-submit">إرسال الرسالة</button>
+        </form>
+    </div>
+</div>
+
+<!-- مودال التنبيهات -->
 <div id="customAlertModal" class="custom-alert-modal">
     <div class="custom-alert-box">
         <i class="fas fa-exchange-alt"></i>
